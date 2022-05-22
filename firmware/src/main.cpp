@@ -1,23 +1,36 @@
 #include <Arduino.h>
-//motor PINS
-#define MOTOR_1_A 2
-#define MOTOR_1_B 3
-#define MOTOR_2_A 4
-#define MOTOR_2_B 5
-#define MOTOR_3_A 8
-#define MOTOR_3_B 9
-#define MOTOR_4_A 10
-#define MOTOR_4_B 11
+//motor PINS: A - PWM, B - direction
+#define MOTOR_1_PWM 3
+#define MOTOR_1_DIR 2
+#define MOTOR_1_SLP 41
+
+#define MOTOR_2_PWM 5
+#define MOTOR_2_DIR 4
+#define MOTOR_2_SLP 35
+
+#define MOTOR_3_PWM 7
+#define MOTOR_3_DIR 6
+#define MOTOR_3_SLP 45
+
+#define MOTOR_4_PWM 10
+#define MOTOR_4_DIR 9
+#define MOTOR_4_SLP 51
+
+//current sensing PINS
+#define MOTOR_1_CS A8
+#define MOTOR_2_CS A9
+#define MOTOR_3_CS A10
+#define MOTOR_4_CS A11
 
 //encoder PINS
-#define ENCODER_1_A 12
-#define ENCODER_1_B 13
-#define ENCODER_2_A 30
-#define ENCODER_2_B 31
-#define ENCODER_3_A 40
-#define ENCODER_3_B 41
-#define ENCODER_4_A 48
-#define ENCODER_4_B 49
+#define ENCODER_1_A 30
+#define ENCODER_1_B 31
+#define ENCODER_2_A 22
+#define ENCODER_2_B 23
+#define ENCODER_3_A 12
+#define ENCODER_3_B 13
+#define ENCODER_4_A 26
+#define ENCODER_4_B 27
 
 //encoder ticks counter
 volatile long enc_tick_1 = 0;
@@ -94,14 +107,18 @@ void setup() {
   // put your setup code here, to run once:
   Serial.begin(115200);
   while (!Serial);
-  pinMode(MOTOR_1_A, OUTPUT);
-  pinMode(MOTOR_1_B, OUTPUT);
-  pinMode(MOTOR_2_A, OUTPUT);
-  pinMode(MOTOR_2_B, OUTPUT);
-  pinMode(MOTOR_3_A, OUTPUT);
-  pinMode(MOTOR_3_B, OUTPUT);
-  pinMode(MOTOR_4_A, OUTPUT);
-  pinMode(MOTOR_4_B, OUTPUT);
+  pinMode(MOTOR_1_PWM, OUTPUT);
+  pinMode(MOTOR_1_DIR, OUTPUT);
+  pinMode(MOTOR_1_SLP, OUTPUT);
+  pinMode(MOTOR_2_PWM, OUTPUT);
+  pinMode(MOTOR_2_DIR, OUTPUT);
+  pinMode(MOTOR_2_SLP, OUTPUT);
+  pinMode(MOTOR_3_PWM, OUTPUT);
+  pinMode(MOTOR_3_DIR, OUTPUT);
+  pinMode(MOTOR_3_SLP, OUTPUT);
+  pinMode(MOTOR_4_PWM, OUTPUT);
+  pinMode(MOTOR_4_DIR, OUTPUT);
+  pinMode(MOTOR_4_SLP, OUTPUT);
   pinMode(ENCODER_1_A, INPUT);
   pinMode(ENCODER_1_B, INPUT);
   pinMode(ENCODER_2_A, INPUT);
@@ -128,67 +145,79 @@ void setup() {
   attachInterrupt(digitalPinToInterrupt(ENCODER_4_B), encoderReadB4, CHANGE);
 }
 
-void motorGo(MOTORS motor, String direct, uint16_t pwm) {
+void motorStart(MOTORS motor, String direct, uint16_t pwm) {
   switch (motor)
   {
   case MOTOR_1:
-    if (direct == "CW") {
-      analogWrite(MOTOR_1_A, pwm);
-      digitalWrite(MOTOR_1_B, LOW);
+    if (direct == "CWW") {
+      analogWrite(MOTOR_1_PWM, pwm);
+      digitalWrite(MOTOR_1_DIR, LOW);
+      digitalWrite(MOTOR_1_SLP, HIGH);
     }
-    else if (direct == "CWW")
+    else if (direct == "CW")
     {
-      analogWrite(MOTOR_1_B, pwm);
-      digitalWrite(MOTOR_1_A, LOW);
+      analogWrite(MOTOR_1_PWM, pwm);
+      digitalWrite(MOTOR_1_DIR, HIGH);
+      digitalWrite(MOTOR_1_SLP, HIGH);
     }
     else {
-      digitalWrite(MOTOR_1_A, LOW);
-      digitalWrite(MOTOR_1_B, LOW);
+      digitalWrite(MOTOR_1_PWM, LOW);
+      digitalWrite(MOTOR_1_DIR, LOW);
+      digitalWrite(MOTOR_1_SLP, LOW);
     }
     break;
   case MOTOR_2:
-    if (direct == "CW") {
-      analogWrite(MOTOR_2_A, pwm);
-      digitalWrite(MOTOR_2_B, LOW);
+    if (direct == "CWW") {
+      analogWrite(MOTOR_2_PWM, pwm);
+      digitalWrite(MOTOR_2_DIR, LOW);
+      digitalWrite(MOTOR_2_SLP, HIGH);
     }
-    else if (direct == "CWW")
+    else if (direct == "CW")
     {
-      analogWrite(MOTOR_2_B, pwm);
-      digitalWrite(MOTOR_2_A, LOW);
+      analogWrite(MOTOR_2_PWM, pwm);
+      digitalWrite(MOTOR_2_DIR, HIGH);
+      digitalWrite(MOTOR_2_SLP, HIGH);
     }
     else {
-      digitalWrite(MOTOR_2_A, LOW);
-      digitalWrite(MOTOR_2_B, LOW);
+      digitalWrite(MOTOR_2_PWM, LOW);
+      digitalWrite(MOTOR_2_DIR, LOW);
+      digitalWrite(MOTOR_2_SLP, LOW);
     }
     break;
   case MOTOR_3:
-    if (direct == "CW") {
-      analogWrite(MOTOR_3_A, pwm);
-      digitalWrite(MOTOR_3_B, LOW);
+    if (direct == "CWW") {
+      analogWrite(MOTOR_3_PWM, pwm);
+      digitalWrite(MOTOR_3_DIR, LOW);
+      digitalWrite(MOTOR_3_SLP, HIGH);
     }
-    else if (direct == "CWW")
+    else if (direct == "CW")
     {
-      analogWrite(MOTOR_3_B, pwm);
-      digitalWrite(MOTOR_3_A, LOW);
+      analogWrite(MOTOR_3_PWM, pwm);
+      digitalWrite(MOTOR_3_DIR, HIGH);
+      digitalWrite(MOTOR_3_SLP, HIGH);
     }
     else {
-      digitalWrite(MOTOR_3_A, LOW);
-      digitalWrite(MOTOR_3_B, LOW);
+      digitalWrite(MOTOR_3_PWM, LOW);
+      digitalWrite(MOTOR_3_DIR, LOW);
+      digitalWrite(MOTOR_3_SLP, LOW);
     }
     break;
   case MOTOR_4:
-    if (direct == "CW") {
-      analogWrite(MOTOR_4_A, pwm);
-      digitalWrite(MOTOR_4_B, LOW);
+    if (direct == "CWW") {
+      analogWrite(MOTOR_4_PWM, pwm);
+      digitalWrite(MOTOR_4_DIR, LOW);
+      digitalWrite(MOTOR_4_SLP, HIGH);
     }
-    else if (direct == "CWW")
+    else if (direct == "CW")
     {
-      analogWrite(MOTOR_4_B, pwm);
-      digitalWrite(MOTOR_4_A, LOW);
+      analogWrite(MOTOR_4_PWM, pwm);
+      digitalWrite(MOTOR_4_DIR, HIGH);
+      digitalWrite(MOTOR_4_SLP, HIGH);
     }
     else {
-      digitalWrite(MOTOR_4_A, LOW);
-      digitalWrite(MOTOR_4_B, LOW);
+      digitalWrite(MOTOR_4_PWM, LOW);
+      digitalWrite(MOTOR_4_DIR, LOW);
+      digitalWrite(MOTOR_4_SLP, LOW);
     }
     break;
   default:
@@ -198,7 +227,15 @@ void motorGo(MOTORS motor, String direct, uint16_t pwm) {
 
 void loop() {
   // put your main code here, to run repeatedly:
-  motorGo(MOTOR_1, "CW", 200);
-  Serial.println(enc_tick_1);  
-
+  motorStart(MOTOR_1, "CWW", 150);
+  motorStart(MOTOR_2, "CWW", 150);
+  motorStart(MOTOR_3, "CWW", 150);
+  motorStart(MOTOR_4, "CWW", 150);
+  Serial.print(enc_tick_1);
+  Serial.print("\t");
+  Serial.print(enc_tick_2);
+  Serial.print("\t");
+  Serial.print(enc_tick_3);
+  Serial.print("\t");
+  Serial.println(enc_tick_4);
 }
